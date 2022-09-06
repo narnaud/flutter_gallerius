@@ -64,10 +64,47 @@ class _HomePageState extends State<HomePage> {
             mainAxisSpacing: 10,
             maxCrossAxisExtent: 200.0,
             children: _pictureFileNames
-                .map((path) => Image.file(File(path)))
+                .map((path) => GestureDetector(
+                    onTap: () {
+                      _showImage(path);
+                    },
+                    child: Hero(
+                        tag: path,
+                        child: Center(
+                          child: PhysicalModel(
+                            color: Colors.black,
+                            elevation: 10,
+                            shadowColor: Colors.black,
+                            child: Image.file(File(path)),
+                          ),
+                        ))))
                 .toList()),
       ),
     );
+  }
+
+  void _showImage(String path) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) {
+        return Scaffold(
+          appBar: AppBar(title: Text(path)),
+          body: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Hero(
+              tag: path,
+              child: Center(
+                child: PhysicalModel(
+                  color: Colors.black,
+                  elevation: 10,
+                  shadowColor: Colors.black,
+                  child: Image.file(File(path)),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    ));
   }
 }
 
