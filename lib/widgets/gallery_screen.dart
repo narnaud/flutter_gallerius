@@ -45,18 +45,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           IconButton(
             icon: const Icon(Icons.folder_open),
             tooltip: 'Open folder',
-            onPressed: () async {
-              String? selectedDirectory =
-                  await _getOpenPictureFolder(_currentDirectory);
-              if (selectedDirectory != null) {
-                setState(
-                  () {
-                    _currentDirectory = selectedDirectory;
-                    _pictureFileNames = _getPicturePaths(selectedDirectory);
-                  },
-                );
-              }
-            },
+            onPressed: _openGallery,
           ),
         ],
       ),
@@ -70,29 +59,61 @@ class _GalleryScreenState extends State<GalleryScreen> {
           children: _pictureFileNames
               .map(
                 (path) => GestureDetector(
-                  onTap: () => (String path) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) {
-                        return ImageScreen(
-                          path: path,
-                        );
-                      },
-                    ));
-                  }(path),
-                  child: Hero(
-                    tag: path,
-                    child: Center(
-                      child: PhysicalModel(
-                        color: Colors.black,
-                        elevation: 10,
-                        shadowColor: Colors.black,
-                        child: Image.file(File(path)),
-                      ),
-                    ),
+                  onTap: () => _openImage(path),
+                  child: GalleryImage(
+                    path: path,
                   ),
                 ),
               )
               .toList(),
+        ),
+      ),
+    );
+  }
+
+  void _openImage(String path) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return ImageScreen(
+            path: path,
+          );
+        },
+      ),
+    );
+  }
+
+  void _openGallery() async {
+    String? selectedDirectory = await _getOpenPictureFolder(_currentDirectory);
+    if (selectedDirectory != null) {
+      setState(
+        () {
+          _currentDirectory = selectedDirectory;
+          _pictureFileNames = _getPicturePaths(selectedDirectory);
+        },
+      );
+    }
+  }
+}
+
+class GalleryImage extends StatelessWidget {
+  const GalleryImage({
+    Key? key,
+    required this.path,
+  }) : super(key: key);
+
+  final String path;
+
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: path,
+      child: Center(
+        child: PhysicalModel(
+          color: Colors.black,
+          elevation: 10,
+          shadowColor: Colors.black,
+          child: Image.file(File(path)),
         ),
       ),
     );
