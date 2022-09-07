@@ -40,45 +40,52 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(_currentDirectory ?? widget.title),
-          actions: <Widget>[
-            IconButton(
-                icon: const Icon(Icons.folder_open),
-                tooltip: 'Open folder',
-                onPressed: () async {
-                  String? selectedDirectory =
-                      await getOpenPictureFolder(_currentDirectory);
-                  if (selectedDirectory != null) {
-                    setState(() {
-                      _currentDirectory = selectedDirectory;
-                      _pictureFileNames = getPicturePaths(selectedDirectory);
-                    });
-                  }
-                }),
-          ]),
+        title: Text(_currentDirectory ?? widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.folder_open),
+            tooltip: 'Open folder',
+            onPressed: () async {
+              String? selectedDirectory =
+                  await getOpenPictureFolder(_currentDirectory);
+              if (selectedDirectory != null) {
+                setState(
+                  () {
+                    _currentDirectory = selectedDirectory;
+                    _pictureFileNames = getPicturePaths(selectedDirectory);
+                  },
+                );
+              }
+            },
+          ),
+        ],
+      ),
       body: Center(
         child: GridView.extent(
-            primary: false,
-            padding: const EdgeInsets.all(16),
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            maxCrossAxisExtent: 200.0,
-            children: _pictureFileNames
-                .map((path) => GestureDetector(
-                    onTap: () {
-                      _showImage(path);
-                    },
-                    child: Hero(
-                        tag: path,
-                        child: Center(
-                          child: PhysicalModel(
-                            color: Colors.black,
-                            elevation: 10,
-                            shadowColor: Colors.black,
-                            child: Image.file(File(path)),
-                          ),
-                        ))))
-                .toList()),
+          primary: false,
+          padding: const EdgeInsets.all(16),
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          maxCrossAxisExtent: 200.0,
+          children: _pictureFileNames
+              .map(
+                (path) => GestureDetector(
+                  onTap: () => _showImage(path),
+                  child: Hero(
+                    tag: path,
+                    child: Center(
+                      child: PhysicalModel(
+                        color: Colors.black,
+                        elevation: 10,
+                        shadowColor: Colors.black,
+                        child: Image.file(File(path)),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
       ),
     );
   }
@@ -111,9 +118,10 @@ class _HomePageState extends State<HomePage> {
 Future<String?> getOpenPictureFolder(String? current) async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String? selectedDirectory = await FilePicker.platform.getDirectoryPath(
-      dialogTitle: "Open Picture Folder",
-      lockParentWindow: true,
-      initialDirectory: current ?? appDocDir.path);
+    dialogTitle: "Open Picture Folder",
+    lockParentWindow: true,
+    initialDirectory: current ?? appDocDir.path,
+  );
   return selectedDirectory;
 }
 
