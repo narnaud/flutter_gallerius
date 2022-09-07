@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_gallerius/widgets/image_screen.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() {
@@ -19,20 +20,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(title: 'Gallerius'),
+      home: const GalleryScreen(title: 'Gallerius'),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.title}) : super(key: key);
+class GalleryScreen extends StatefulWidget {
+  const GalleryScreen({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<GalleryScreen> createState() => _GalleryScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _GalleryScreenState extends State<GalleryScreen> {
   String? _currentDirectory;
   List<String> _pictureFileNames = [];
 
@@ -70,7 +71,15 @@ class _HomePageState extends State<HomePage> {
           children: _pictureFileNames
               .map(
                 (path) => GestureDetector(
-                  onTap: () => _showImage(path),
+                  onTap: () => (String path) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return ImageScreen(
+                          path: path,
+                        );
+                      },
+                    ));
+                  }(path),
                   child: Hero(
                     tag: path,
                     child: Center(
@@ -88,30 +97,6 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  void _showImage(String path) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) {
-        return Scaffold(
-          appBar: AppBar(title: Text(path)),
-          body: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Hero(
-              tag: path,
-              child: Center(
-                child: PhysicalModel(
-                  color: Colors.black,
-                  elevation: 10,
-                  shadowColor: Colors.black,
-                  child: Image.file(File(path)),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    ));
   }
 }
 
