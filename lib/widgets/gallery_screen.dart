@@ -44,29 +44,34 @@ class _GalleryScreenState extends State<GalleryScreen> {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.folder_open),
-            tooltip: 'Open folder',
+            tooltip: 'Open Folder',
             onPressed: _openGallery,
           ),
         ],
       ),
       body: Center(
-        child: GridView.extent(
-          primary: false,
-          padding: const EdgeInsets.all(16),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          maxCrossAxisExtent: 200.0,
-          children: _pictureFileNames
-              .map(
-                (path) => GestureDetector(
-                  onTap: () => _openImage(path),
-                  child: GalleryImage(
-                    path: path,
-                  ),
-                ),
+        child: _currentDirectory == null
+            ? OutlinedButton(
+                onPressed: _openGallery,
+                child: const Text("Open Folder"),
               )
-              .toList(),
-        ),
+            : GridView.extent(
+                primary: false,
+                padding: const EdgeInsets.all(16),
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                maxCrossAxisExtent: 200.0,
+                children: _pictureFileNames
+                    .map(
+                      (path) => GestureDetector(
+                        onTap: () => _openImage(path),
+                        child: GalleryImage(
+                          path: path,
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
       ),
     );
   }
