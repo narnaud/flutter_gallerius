@@ -2,10 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_gallerius/widgets/image_screen.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-Future<String?> _getOpenPictureFolder(String? current) async {
+import 'package:flutter_gallerius/logic/gallery.dart';
+import 'package:flutter_gallerius/widgets/image_screen.dart';
+
+Future<String?> _getOpenFolder(String? current) async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String? selectedDirectory = await FilePicker.platform.getDirectoryPath(
     dialogTitle: "Open Picture Folder",
@@ -15,32 +18,35 @@ Future<String?> _getOpenPictureFolder(String? current) async {
   return selectedDirectory;
 }
 
-List<String> _getPicturePaths(String path) {
-  final pictureDir = Directory(path);
-  return pictureDir
-      .listSync(recursive: false)
-      .map((item) => item.path)
-      .where((item) => (item.endsWith(".jpg") || item.endsWith(".png")))
-      .toList(growable: false);
-}
-
-class GalleryScreen extends StatefulWidget {
+class GalleryScreen extends ConsumerWidget {
   const GalleryScreen({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
-  State<GalleryScreen> createState() => _GalleryScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gallery = ref.watch(galleryProvider);
+    final String? path = gallery.currentPath;
 
-class _GalleryScreenState extends State<GalleryScreen> {
-  String? _currentDirectory;
-  List<String> _pictureFileNames = [];
+    _openGallery() async {
+      String? galleryPath = await _getOpenFolder(path);
+      if (galleryPath != null) gallery.setCurrentPath(galleryPath);
+    }
 
-  @override
-  Widget build(BuildContext context) {
+    void _openImage(String path) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) {
+            return ImageScreen(
+              path: path,
+            );
+          },
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_currentDirectory ?? widget.title),
+        title: Text(path ?? title),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.folder_open),
@@ -50,7 +56,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
         ],
       ),
       body: Center(
-        child: _currentDirectory == null
+        child: path == null
             ? OutlinedButton(
                 onPressed: _openGallery,
                 child: const Text("Open Folder"),
@@ -61,7 +67,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
                 maxCrossAxisExtent: 200.0,
-                children: _pictureFileNames
+                children: ref
+                    .watch(galleryProvider)
+                    .pictureFileNames
                     .map(
                       (path) => GestureDetector(
                         onTap: () => _openImage(path),
@@ -74,30 +82,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ),
       ),
     );
-  }
-
-  void _openImage(String path) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          return ImageScreen(
-            path: path,
-          );
-        },
-      ),
-    );
-  }
-
-  void _openGallery() async {
-    String? selectedDirectory = await _getOpenPictureFolder(_currentDirectory);
-    if (selectedDirectory != null) {
-      setState(
-        () {
-          _currentDirectory = selectedDirectory;
-          _pictureFileNames = _getPicturePaths(selectedDirectory);
-        },
-      );
-    }
   }
 }
 
