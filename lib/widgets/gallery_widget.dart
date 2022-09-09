@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
 import 'package:flutter_gallerius/logic/gallery.dart';
+import 'package:path/path.dart' as p;
 
 class GalleryWidget extends StatelessWidget {
   const GalleryWidget({
@@ -53,7 +53,10 @@ class GalleryImage extends StatelessWidget {
           color: Colors.black,
           elevation: 10,
           shadowColor: Colors.black,
-          child: Image.file(File(path)),
+          child: Tooltip(
+            message: p.basename(path),
+            child: Image.file(File(path)),
+          ),
         ),
       ),
     );
