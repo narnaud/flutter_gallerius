@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gallerius/widgets/gallery_screen.dart';
+import 'package:flutter_gallerius/widgets/gallery_home.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const GalleryScreen(title: 'Gallerius'),
+      home: const GalleryHome(title: 'Gallerius'),
     );
   }
 }
